@@ -13,8 +13,8 @@ def save(probs: Dict[Tuple[str, str], float]):
     os.makedirs(os.path.dirname(fname), exist_ok=True)
     with open(fname, 'w', newline='') as f:
         writer = csv.writer(f, delimiter='\t')
-        for (s, w), p in probs.items():
-            writer.writerow([s, w, p])
+        for (w, s), p in probs.items():
+            writer.writerow([w, s, p])
 
 
 def main():
@@ -36,7 +36,7 @@ def main():
         #     print(correct, error, d)
     e_count = Counter(entries)
     c_count = Counter(changes)
-    probs = {(s, w): c/e_count[s] for (s, w), c in c_count.items()}
+    probs = {(w, s): c/e_count[w] for (w, s), c in c_count.items()}
     save(probs)
 
 
