@@ -54,12 +54,12 @@ class DameLevErrorModel(object):
         for i in range(1, l1 + 1):
             for j in range(1, l2 + 1):
                 edits = [
-                    (d[i-1][j][0] + 1, d[i-1][j][1] + ('{}|'.format(seq1[i-1]),)),
-                    (d[i][j-1][0] + 1, d[i][j-1][1] + ('|{}'.format(seq2[j-1]),)),
-                    (d[i-1][j-1][0] + (seq1[i-1] != seq2[j-1]), d[i-1][j-1][1] + ('{}|{}'.format(seq1[i-1], seq2[j-1]),))
+                    (d[i-1][j][0] + 1, d[i-1][j][1] + ((seq1[i-1], ''),)),
+                    (d[i][j-1][0] + 1, d[i][j-1][1] + (('', seq2[j-1]),)),
+                    (d[i-1][j-1][0] + (seq1[i-1] != seq2[j-1]), d[i-1][j-1][1] + ((seq1[i-1], seq2[j-1]),))
                 ]
                 if i > 1 and j > 1 and seq1[i-1] == seq2[j-2] and seq1[i-2] == seq2[j-1]:
-                    edits.append((d[i-2][j-2][0] + (seq1[i-1] != seq2[j-1]), d[i-2][j-2][1] + ('{}|{}'.format(seq1[i-2:i], seq2[j-2:j]),)))
+                    edits.append((d[i-2][j-2][0] + (seq1[i-1] != seq2[j-1]), d[i-2][j-2][1] + ((seq1[i-2:i], seq2[j-2:j]),)))
                 d[i][j] = min(edits, key=lambda x: x[0])
 
         return d[-1][-1]
