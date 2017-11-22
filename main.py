@@ -1,7 +1,5 @@
 from data_providers.russian_words import DataProvider
 
-import pygtrie
-# from copy import deepcopy
 from time import time
 from collections import defaultdict
 
@@ -10,10 +8,11 @@ import csv
 from math import log, exp
 
 
-words = DataProvider(short=False).data
-
 s = time()
-words_trie = pygtrie.CharTrie.fromkeys(words, True)
+ds = DataProvider(short=False)
+
+words = ds.data
+words_trie = ds.words_trie
 print('Time spent creating the words trie', time() - s)
 
 alphabet = {c for w in words for c in w}
@@ -30,9 +29,9 @@ with open('target/probs_ru.tsv') as tsvfile:
 candidates = {}
 
 
-def calc_lev(d, prefixes, w, k=10):
+def calc_lev(d, prefixes, w):
     w = '•' + w.lower().replace('ё', 'е')
-    while k and prefixes:
+    while prefixes:
         new_prefixes = set()
         for prefix in prefixes:
             res = []
@@ -47,13 +46,12 @@ def calc_lev(d, prefixes, w, k=10):
             d[prefix] = res
             if prefix in words_trie:
                 candidates[prefix] = exp(res[-1])
-                k -= 1
             if max(res) > -6.91:  # log(0.001)
                 new_prefixes.update({x[:len(prefix) + 1] for x in words_trie.keys(prefix) if len(x) > len(prefix)})
         prefixes = new_prefixes
 
 
-to_fix = 'коловрат'
+to_fix = 'кндидатская'
 s = time()
 distances = {}
 calc_lev(distances, {''}, to_fix)

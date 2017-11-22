@@ -1,3 +1,5 @@
+import marisa_trie
+
 from utils.data import download, is_done, mark_done
 import os
 import random
@@ -43,3 +45,12 @@ class DataProvider(object):
 
         with open(fname) as f:
             self.data = {self._normalize(w) for w in f}
+
+        pkl_name = 'target/russian_{}.trie'.format('short' if short else 'full')
+
+        if not os.path.isfile(pkl_name):
+            words_trie = marisa_trie.Trie(self.data)
+            words_trie.save(pkl_name)
+
+        self.words_trie = marisa_trie.Trie()
+        self.words_trie.load(pkl_name)
