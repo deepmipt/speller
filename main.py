@@ -8,9 +8,12 @@ import csv
 from math import log, exp
 from heapq import heappushpop, heappop, heappush
 
+import nltk
+nltk.download('punkt')
+
 
 s = time()
-ds = DataProvider(short=False)
+ds = DataProvider(compreno=True)
 
 words = ds.data
 words_trie = ds.words_trie
@@ -32,7 +35,8 @@ def get_children(trie, prefix):
     return trie[prefix]
 
 
-def calc_lev(trie, word, k=10, threshold=-11.5):
+def calc_lev(trie, word, k=10, prop_threshold=1e-4):
+    threshold = log(prop_threshold)
     d = {}
     prefixes_heap = [(0, {''})]
     candidates = [(float('-inf'), '') for _ in range(k)]
@@ -58,12 +62,12 @@ def calc_lev(trie, word, k=10, threshold=-11.5):
     return [(w, exp(score)) for score, w in sorted(candidates, reverse=True)]
 
 
-text = '''есть у вас оформленый и подписаный мною заказ
-вот в инете откапал такую интеерсную статейку предлагаю вашему внимани
-я на всю жизнь запомню свое первое купание в зимнем ледяном енисее
-думаем что не ошибемся если скажем что выставка лучшие фотографии россии 2012 станет одним из самых значимых событий
-в культурной жизни перми и ее жителей'''
-for to_fix in text.split():
+text = '''найдены также остатки мыла которое викинги делали самостоятельно
+география его выступлений достегает индии англии венгрии португалии голландии финляндии
+давольно милый и летом и зимой обогреваемый теплым солнушком
+после моего доклада программа была паб-ресторан-паб после чего такси ловил нетвердо стоя на ногах
+только вот не хочеться мне одной делать такие героическии поступки'''
+for to_fix in nltk.tokenize.word_tokenize(text):
     s = time()
     candidates = calc_lev(words_trie, to_fix, k=10)
     print('{:.3f}s to do "{}"'.format(time() - s, to_fix))

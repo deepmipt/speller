@@ -42,13 +42,16 @@ class DataProvider(object):
     def _normalize(w):
         return w.strip().replace('ё', 'е').lower()
 
-    def __init__(self, datapath='downloads', short=False):
-        fname = os.path.join(build(datapath), 'shortlist.txt' if short else 'russian.txt')
+    def __init__(self, datapath='downloads', compreno=False):
+        fname = os.path.join(build(datapath), 'compreno_wordforms.txt' if compreno else 'russian.txt')
+
+        if not os.path.isfile(fname):
+            raise RuntimeError('could not find the {} file. Please, provide a dictionary'.format(fname))
 
         with open(fname) as f:
             self.data = {self._normalize(w) for w in f}
 
-        pkl_name = 'target/russian_{}.pkl'.format('short' if short else 'full')
+        pkl_name = 'target/russian_{}.pkl'.format('compreno' if compreno else 'full')
 
         if not os.path.isfile(pkl_name):
             words_trie = defaultdict(set)
