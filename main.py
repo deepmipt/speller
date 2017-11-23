@@ -6,6 +6,7 @@ from collections import defaultdict
 import csv
 
 from math import log, exp
+from heapq import heappushpop, heappop, heappush
 
 
 s = time()
@@ -26,16 +27,21 @@ with open('target/probs_ru.tsv') as tsvfile:
     for l, r, p in reader:
         costs[(l, r)] = log(float(p))
 
-candidates = {}
+
+def get_children(trie, prefix):
+    return trie[prefix]
 
 
-def calc_lev(d, prefixes, w):
-    w = '•' + w.lower().replace('ё', 'е')
-    while prefixes:
-        new_prefixes = set()
+def calc_lev(trie, word, k=10, threshold=-11.5):
+    d = {}
+    prefixes_heap = [(0, {''})]
+    candidates = [(float('-inf'), '') for _ in range(k)]
+    word = '•' + word.lower().replace('ё', 'е')
+    while prefixes_heap and -prefixes_heap[0][0] > candidates[0][0]:
+        _, prefixes = heappop(prefixes_heap)
         for prefix in prefixes:
             res = []
-            for i, c in enumerate(w):
+            for i, c in enumerate(word):
                 c = c.replace('•', '')
                 res.append(max(
                     (res[-1] + costs[(prefix[-1] if prefix else '', c)]) if i else float('-inf'),
@@ -44,20 +50,23 @@ def calc_lev(d, prefixes, w):
                     if prefix and i else float('-inf')
                 ) if i or prefix else 0)
             d[prefix] = res
-            if prefix in words_trie:
-                candidates[prefix] = exp(res[-1])
-            if max(res) > -6.91:  # log(0.001)
-                new_prefixes.update({x[:len(prefix) + 1] for x in words_trie.keys(prefix) if len(x) > len(prefix)})
-        prefixes = new_prefixes
+            if prefix in words:
+                heappushpop(candidates, (res[-1], prefix))
+            potential = max(res)
+            if potential > threshold:
+                heappush(prefixes_heap, (-potential, get_children(trie, prefix)))
+    return [(w, exp(score)) for score, w in sorted(candidates, reverse=True)]
 
 
-to_fix = 'кндидатская'
-s = time()
-distances = {}
-calc_lev(distances, {''}, to_fix)
-print('Time to do everything else', time() - s)
+text = '''есть у вас оформленый и подписаный мною заказ
+вот в инете откапал такую интеерсную статейку предлагаю вашему внимани
+я на всю жизнь запомню свое первое купание в зимнем ледяном енисее
+думаем что не ошибемся если скажем что выставка лучшие фотографии россии 2012 станет одним из самых значимых событий
+в культурной жизни перми и ее жителей'''
+for to_fix in text.split():
+    s = time()
+    candidates = calc_lev(words_trie, to_fix, k=10)
+    print('{:.3f}s to do "{}"'.format(time() - s, to_fix))
 
-candidates_short = sorted(candidates.items(), key=lambda x: x[1], reverse=True)[:5]
-
-print(to_fix)
-print(candidates_short)
+    print(candidates)
+    print()

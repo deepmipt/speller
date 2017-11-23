@@ -1,4 +1,6 @@
-import marisa_trie
+from collections import defaultdict
+
+import pickle
 
 from utils.data import download, is_done, mark_done
 import os
@@ -46,11 +48,15 @@ class DataProvider(object):
         with open(fname) as f:
             self.data = {self._normalize(w) for w in f}
 
-        pkl_name = 'target/russian_{}.trie'.format('short' if short else 'full')
+        pkl_name = 'target/russian_{}.pkl'.format('short' if short else 'full')
 
         if not os.path.isfile(pkl_name):
-            words_trie = marisa_trie.Trie(self.data)
-            words_trie.save(pkl_name)
+            words_trie = defaultdict(set)
+            for word in self.data:
+                for i in range(len(word)):
+                    words_trie[word[:i]].add(word[:i+1])
+            with open(pkl_name, 'wb') as f:
+                pickle.dump(words_trie, f)
 
-        self.words_trie = marisa_trie.Trie()
-        self.words_trie.load(pkl_name)
+        with open(pkl_name, 'rb') as f:
+            self.words_trie = pickle.load(f)
