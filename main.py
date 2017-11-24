@@ -35,18 +35,19 @@ def get_children(trie, prefix):
     return trie[prefix]
 
 
-def calc_lev(trie, word, k=10, prop_threshold=1e-4):
+def find_candidates(trie, word, k=10, prop_threshold=1e-4):
     threshold = log(prop_threshold)
     d = {}
     prefixes_heap = [(0, {''})]
     candidates = [(float('-inf'), '') for _ in range(k)]
-    word = '•' + word.lower().replace('ё', 'е')
+    word = word.lower().replace('ё', 'е')
+    word_len = len(word) + 1
     while prefixes_heap and -prefixes_heap[0][0] > candidates[0][0]:
         _, prefixes = heappop(prefixes_heap)
         for prefix in prefixes:
             res = []
-            for i, c in enumerate(word):
-                c = c.replace('•', '')
+            for i in range(word_len):
+                c = word[i-1:i]
                 res.append(max(
                     (res[-1] + costs[(prefix[-1] if prefix else '', c)]) if i else float('-inf'),
                     d[prefix[:-1]][i] + costs[(prefix[-1], '')] if prefix else float('-inf'),
@@ -66,10 +67,11 @@ text = '''найдены также остатки мыла которое ви�
 география его выступлений достегает индии англии венгрии португалии голландии финляндии
 давольно милый и летом и зимой обогреваемый теплым солнушком
 после моего доклада программа была паб-ресторан-паб после чего такси ловил нетвердо стоя на ногах
-только вот не хочеться мне одной делать такие героическии поступки'''
+только вот не хочеться мне одной делать такие героическии поступки
+до свидвания'''
 for to_fix in nltk.tokenize.word_tokenize(text):
     s = time()
-    candidates = calc_lev(words_trie, to_fix, k=10)
+    candidates = find_candidates(words_trie, to_fix, k=5)
     print('{:.3f}s to do "{}"'.format(time() - s, to_fix))
 
     print(candidates)
