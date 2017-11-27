@@ -40,7 +40,7 @@ class DataProvider(object):
 
     @staticmethod
     def _normalize(w):
-        return w.strip().replace('ё', 'е').lower()
+        return '⟬{}⟭'.format(w.strip().replace('ё', 'е').lower())
 
     def __init__(self, datapath='downloads', compreno=False):
         fname = os.path.join(build(datapath), 'compreno_wordforms.txt' if compreno else 'russian.txt')
@@ -53,7 +53,7 @@ class DataProvider(object):
 
         pkl_name = 'target/russian_{}.pkl'.format('compreno' if compreno else 'full')
 
-        if not os.path.isfile(pkl_name):
+        if not os.path.isfile(pkl_name) or 1:
             words_trie = defaultdict(set)
             for word in self.data:
                 for i in range(len(word)):
