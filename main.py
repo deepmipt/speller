@@ -29,7 +29,7 @@ for c in alphabet:
 
 with open('target/probs_ru.tsv') as tsvfile:
     reader = csv.reader(tsvfile, delimiter='\t')
-    for l, r, p in reader:
+    for l, r, p, rc, lc in reader:
         costs[(l, r)] = log(float(p))
 
 
