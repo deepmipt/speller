@@ -53,7 +53,7 @@ class DataProvider(object):
 
         pkl_name = 'target/russian_{}.pkl'.format('compreno' if compreno else 'full')
 
-        if not os.path.isfile(pkl_name) or 1:
+        if not os.path.isfile(pkl_name):
             words_trie = defaultdict(set)
             for word in self.data:
                 for i in range(len(word)):

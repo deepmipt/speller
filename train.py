@@ -25,7 +25,7 @@ def main():
     changes = []
     entries = []
     n = len(dp.train)
-    window = 2
+    window = 4
     for i, (correct, error, weight) in enumerate(dp.train):
         correct = '⟬{}⟭'.format(correct)
         error = '⟬{}⟭'.format(error)

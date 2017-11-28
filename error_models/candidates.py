@@ -54,8 +54,10 @@ def find_candidates_v2(trie, words, costs, word, k=10, prop_threshold=1e-4, wind
                 c_res = [inf]
                 for li in range(1, min(prefix_len + 1, window + 2)):
                     for ri in range(1, min(i+1, window + 2)):
-                        c_res.append(d[prefix[:prefix_len - li]][i-ri] +
-                                     costs[(prefix[prefix_len-li:prefix_len], word[i-ri:i])])
+                        prev = d[prefix[:prefix_len - li]][i-ri]
+                        if prev > threshold:
+                            c_res.append(prev +
+                                         costs[(prefix[prefix_len-li:prefix_len], word[i-ri:i])])
                 res.append(max(c_res))
             if prefix in words:
                 heappushpop(candidates, (res[-1], prefix))

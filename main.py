@@ -71,7 +71,7 @@ try:
         # else:
         #     print(incorrect, raw, correct)
 
-        if i % 50 == 0:
+        if i % 5 == 0:
             print('{} out of {}'.format(i+1, examples))
             print('avg time: {:.3}; 1-best: {:06.2f}%; 2-best: {:06.2f}%; 3-best {:06.2f}%'.format(
                 sum(times)/len(times), 100*one/seen, 100*two/seen, 100*three/seen
